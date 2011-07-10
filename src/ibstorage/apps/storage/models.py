@@ -14,7 +14,11 @@ if getattr(settings, "AWS_ACCESS_KEY_ID", False) and getattr(settings, "AWS_SECR
     Storage = S3BotoStorage()
 else:
     Storage = None
-VIEW_IN_GDOCS = getattr(settings, 'VIEW_IN_GDOCS', ('.pdf', '.doc'))
+VIEW_IN_GDOCS = getattr(settings, 'VIEW_IN_GDOCS', (
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf', '.pages', '.ai', '.psd', '.tiff', '.dxf', '.svg', '.eps',
+    '.ps', '.ttf', '.xps'))
+
+
 
 # Create your models here.
 def get_user_upload_dir(user_file, filename):
