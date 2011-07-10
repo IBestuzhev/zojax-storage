@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>IBStorage</title>
+    <!-- Framework CSS -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/storage.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/print.css" type="text/css" media="print" />
+    <!--[if IE]><link rel="stylesheet" href="{{ STATIC_URL }}css/ie.css" type="text/css" media="screen, projection" /><![endif]-->
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.address-1.4.js?crawlable=1&autoUpdate=1"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/pure.js"></script>
+    <script type="text/javascript">
+        var blocks = ['login', 'filelist', 'fileupload']
+        var filelist_directives = {
+            '.emptyMsg' : 'emptyMsg',
+            '.files li' :  {
+                'file <- files' :{
+                    'a' : 'file.file',
+                    'a@href' : 'file.link',
+                    'a@rel' : 'address:#{file.link}',
+                    'em' : 'file.uploaded_at'
+                }
+            }
+        }
+        var fileupload_directives = {}
+        function reload_callback(data) {
+            console.log(data)
+            var block;
+            var blockDiv;
+            if (data.hasOwnProperty('redirect')) {
+                console.log('redirect')
+                return $.address.value(data.redirect)
+            }
+            
+            for (var i=0, blocksNum=blocks.length; i<blocksNum; i++ ) {
+                block = blocks[i];
+                if (data.hasOwnProperty(block)) {
+                    blockDiv = $("#"+block)
+                    blockDiv.show()
+                    if (typeof window[block+'_render'] == 'undefined') {
+                        window[block+'_render'] = $p("#"+block).compile(window[block+'_directives'])
+                    }
+                    $p("#"+block).render(data[block], window[block+'_render'])
+                }
+                else {
+                    $("#"+block).hide()
+                }
+            }
+        }
+        function ajax_load(url) {
+            $.ajax({
+                url: url,
+                success: reload_callback
+            })
+        }
+        $(function() {
+            $.address.change(function(event) {
+                var url = event.value
+                if (url == '/' || url.indexOf('?')>=0 && url.substr(0,url.indexOf('?')))
+                {
+                    url = '/list-files/';
+                }
+                ajax_load(url);
+            });
+            $("#uploadForm").live('submit', function(){ $(this).ajaxSubmit({success:reload_callback,dataType:'json'}); return false; })
+        })
+
+
+    </script>
+</head>
+<body>
+<div id="head">
+    <div class="container">
+        <div class="span-4">Logo here</div>
+        <div class="span-4 prepend-16 last">Some information here {{ user }}</div>
+    </div>
+</div>
+<div id="main">
+    <div class="container">
+        <div id="instructions" class="span-7 blueblock">
+            <a href="/l/" rel="address:/l/">L</a><br/>
+            <a href="/upload/" rel="address:/upload/">Upload</a>
+        </div>
+        <div id="login" class="span-7 blueblock"></div>
+        <div id="filelist" class="span-7 blueblock">
+            <div class="emptyMsg"></div>
+            <ul class="files">
+                <li><a></a><br/><em></em></li>
+            </ul>
+        </div>
+        <div id="fileupload" class="span-7 blueblock">
+            <form action="/upload/" id="uploadForm" method="POST" enctype="multipart/form-data" >
+                <input id="file_upload" name="file_upload" type="file">
+                <input type="submit">
+            </form>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container"></div>
+</div>
+</body>
+</html>
