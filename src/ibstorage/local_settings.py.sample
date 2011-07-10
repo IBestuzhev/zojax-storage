@@ -1,0 +1,24 @@
+DEFAULT_FROM_EMAIL = "storage@ibstorage.com"
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '1025'
+
+GOOGLE_OAUTH2_CLIENT_KEY = '470273745888.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET = 'MmA1RqxzDWAHNAg7P-scoZoI'
+
+TWITTER_CONSUMER_KEY = "UWVOpUpj0d3vCvvfwgEtg"
+TWITTER_CONSUMER_SECRET = "lJk9u0bj8WNUnHdFJRbISU8uSitiV5fOVIzOtsk"
+
+AWS_ACCESS_KEY_ID = "AKIAJVQCG37DD7GILPZQ"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "zojax"
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '/opt/zojax/storage/db/storage.db',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}

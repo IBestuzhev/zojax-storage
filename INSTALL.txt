@@ -1,0 +1,56 @@
+INSTALLATION
+
+1. Download code from github https://github.com/IBestuzhev/zojax-storage
+2. Run `python bootstrap.py` from root directory
+3. Run `bin/buildout`
+
+REQUIREMENTS
+
+Buildout requires only python2.x itself.
+All other dependencies will be downloaded:
+- django
+- django-storages
+- south
+- django-social-auth
+
+CONFIGURATION
+
+Create file src/ibstorage/local_settings.py to provide settings.
+You should put there such settings:
+- Amazon S3 Keys and bucket. If you don't put these files will be saved in MEDIA_ROOT = src/ibstorage/media/
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME
+- Google and Twitter auth keys
+    GOOGLE_OAUTH2_CLIENT_KEY
+    GOOGLE_OAUTH2_CLIENT_SECRET
+    TWITTER_CONSUMER_KEY
+    TWITTER_CONSUMER_SECRET
+- SMTP settings
+    DEFAULT_FROM_EMAIL
+    EMAIL_HOST
+    EMAIL_PORT
+- Database settings
+    DATABASES
+
+See file src/ibstorage/local_settings.py.sample for example
+
+DEPLOYMENT
+
+buildout generates file bin/django.wsgi
+You should use this file to serve application.
+
+* Database setup
+After you provide connection details for database you can use django to create all necessary tables
+Run `bin/django syncdb` and `bin/django migrate` commands.
+This app uses django flatpages, you can load it with `bin/django loaddata flatpages.json`
+
+* Static files
+By default app serves static and media files in debug mode only
+
+If you are not using S3 storage you should point your webserver to serve media files at /media/
+from src/ibstorage/media/
+
+Static url is /static/ . You should point this URL to src/ibstorage/static/
+Use `bin/django collectstatic` command to copy all static files to STATIC_ROOT.
+You can use '-l' key to use symlinks instead of copy

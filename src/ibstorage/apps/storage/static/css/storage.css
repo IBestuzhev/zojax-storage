@@ -34,3 +34,8 @@ li.public-file a {
 #footer {
     border-top: 2px solid #EAF2F5;
 }
+div.field {
+    margin-bottom: 3px;
+    padding-bottom: 3px;
+    border-bottom: 1px dotted #add8e6;
+}

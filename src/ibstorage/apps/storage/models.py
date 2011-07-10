@@ -47,7 +47,7 @@ class UserFile(models.Model):
         url = self.file.url
         if callable(absolutizer):
             url = absolutizer(url)
-        return "http://docs.google.com/viewer?%s" % urllib.urlencode({'url' : url})
+        return "http://docs.google.com/viewer?%s" % urllib.urlencode({'url': url})
 
     def __unicode__(self):
         return unicode(self.file)
@@ -62,4 +62,5 @@ def delete_handler(instance, using=None, **kwargs):
     """ Handler that deletes file on deleting UserFile instance
     """
     instance.file.delete(save=False)
+
 pre_delete.connect(delete_handler, sender=UserFile, dispatch_uid='file_delete_handler')

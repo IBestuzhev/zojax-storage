@@ -16,7 +16,6 @@ from storage.forms import UserFileForm, ShareForm
 
 FROM_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', 'storage@ibstorage.com')
 
-
 class IndexView(TemplateView):
     """A view to render index template
     """
@@ -63,13 +62,13 @@ def list_files(request, page_num=1):
     for file in page.object_list:
         resp['files'].append({
             'file': file.get_file_name(),
-            'link': reverse(fileinfo, kwargs={'id' : file.id}),
-            'uploaded_at' : file.uploaded_at,
-            'public' : file.public
+            'link': reverse(fileinfo, kwargs={'id': file.id}),
+            'uploaded_at': file.uploaded_at,
+            'public': file.public
         })
     resp['pages'] = pagination.page_range
     resp['cur_page'] = page.number
-    return {'filelist' : resp,}
+    return {'filelist': resp, }
 
 
 @csrf_exempt
@@ -85,7 +84,7 @@ def upload(request):
         errors - errors in upload form
     """
     if request.method == "GET":
-        return {"fileupload":True}
+        return {"fileupload": True}
 
     form = UserFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -93,8 +92,8 @@ def upload(request):
         upload.user = request.user
         upload.save()
         messages.info(request, "File was successfully uploaded")
-        return {'redirect':'/list-files/', '_type':'text/html'}
-    return {'_type':'text/html', "fileupload":{'errors':form.errors}}
+        return {'redirect': '/list-files/', '_type': 'text/html'}
+    return {'_type': 'text/html', "fileupload": {'errors': form.errors}}
 
 
 @ajax_redirect
@@ -112,31 +111,32 @@ def fileinfo(request, id):
     try:
         user_file = UserFile.objects.get(id=int(id))
     except (ValueError, UserFile.DoesNotExist):
-        return {'fileinfo':{'errorMsg':'No such file'}}
+        return {'fileinfo': {'errorMsg': 'No such file'}}
 
     if not (user_file.public or user_file.user == request.user):
-        return {'fileinfo':{'errorMsg':'This file is protected'}}
+        return {'fileinfo': {'errorMsg': 'This file is protected'}}
 
-    actions = [{'action':'View', 'local': False, 'url': user_file.file.url}]
+    actions = [{'action': 'View', 'local': False, 'url': user_file.file.url}]
     if user_file.suitable_for_gdocs():
-        actions.append({'action': 'View with Google Docs Viewer', 'url':user_file.get_gdocs_url(request.build_absolute_uri), 'local':False})
+        actions.append(
+                {'action': 'View with Google Docs Viewer', 'url': user_file.get_gdocs_url(request.build_absolute_uri),
+                 'local': False})
 
     if user_file.user == request.user:
-        actions.append({'action' : 'Change public', 'url' : reverse(change_publish, kwargs={'id' : id}), 'local' : True})
+        actions.append({'action': 'Change public', 'url': reverse(change_publish, kwargs={'id': id}), 'local': True})
         if user_file.public:
-            actions.append({'action' : 'Share', 'url' : reverse(share, kwargs={'id' : id}), 'local' : True})
-        actions.append({'action' : 'Delete', 'url' : reverse(delete, kwargs={'id' : id}), 'local' : True})
+            actions.append({'action': 'Share', 'url': reverse(share, kwargs={'id': id}), 'local': True})
+        actions.append({'action': 'Delete', 'url': reverse(delete, kwargs={'id': id}), 'local': True})
 
     info = [
-        {'name' : 'status', 'value' : 'public' if user_file.public else 'private'},
-        {'name' : 'author', 'value' : user_file.user.username},
-        {'name' : 'uploaded', 'value' : user_file.uploaded_at},
-    ]
+            {'name': 'status', 'value': 'public' if user_file.public else 'private'},
+            {'name': 'author', 'value': user_file.user.username},
+            {'name': 'uploaded', 'value': user_file.uploaded_at}]
 
-    return {'fileinfo' : {
-        'file' : user_file.get_file_name(),
-        'actions' : actions,
-        'info' : info
+    return {'fileinfo': {
+        'file': user_file.get_file_name(),
+        'actions': actions,
+        'info': info
     }}
 
 
@@ -157,7 +157,7 @@ def share(request, id):
     try:
         user_file = UserFile.objects.get(id=int(id))
     except (ValueError, UserFile.DoesNotExist):
-        return {'redirect' : '/'}
+        return {'redirect': '/'}
 
     form = ShareForm(request.POST or None)
     file_link = reverse(fileinfo, kwargs={'id': id})
@@ -165,20 +165,20 @@ def share(request, id):
         msg = "Your friend %s shares a file with you:\n%s" % (
             user_file.user.username,
             request.build_absolute_uri(file_link)
-        )
+            )
         if form.cleaned_data['message']:
             msg = "%s\n\nHis/her comments:\n%s" % (msg, form.cleaned_data['message'])
 
         send_mail("Check this file", msg, FROM_EMAIL, form.cleaned_data['emails'])
         messages.info(request, "Your mail was sent to %s" % ','.join(form.cleaned_data['emails']))
-        return {'redirect' : file_link, '_type' : 'text/html'}
+        return {'redirect': file_link, '_type': 'text/html'}
 
-    return {'sharebox' : {
-        'absolute_link' : request.build_absolute_uri(file_link),
-        'link' : file_link,
-        'action' : request.path,
-        'form' : form.as_p(),
-        'file' : user_file.get_file_name()
+    return {'sharebox': {
+        'absolute_link': request.build_absolute_uri(file_link),
+        'link': file_link,
+        'action': request.path,
+        'form': form.as_p(),
+        'file': user_file.get_file_name()
     }}
 
 
@@ -201,22 +201,22 @@ def change_publish(request, id):
     try:
         user_file = UserFile.objects.get(id=int(id))
     except (ValueError, UserFile.DoesNotExist):
-        return {'redirect' : '/'}
+        return {'redirect': '/'}
 
     if user_file.user == request.user:
         if request.method == "POST":
             user_file.public = not user_file.public
             user_file.save()
             messages.info(request, "File published status changed")
-            return {'redirect' : reverse(fileinfo, kwargs={'id': id})}
+            return {'redirect': reverse(fileinfo, kwargs={'id': id})}
 
-        return {'publish' : {
-            'status' : 'public' if user_file.public else 'private',
-            'action_link' : request.path,
-            'back_link' : reverse(fileinfo, kwargs={'id': id}),
-            'file' : user_file.get_file_name()
+        return {'publish': {
+            'status': 'public' if user_file.public else 'private',
+            'action_link': request.path,
+            'back_link': reverse(fileinfo, kwargs={'id': id}),
+            'file': user_file.get_file_name()
         }}
-    return {'redirect' : '/'}
+    return {'redirect': '/'}
 
 
 @csrf_exempt
@@ -237,20 +237,20 @@ def delete(request, id):
     try:
         user_file = UserFile.objects.get(id=int(id))
     except (ValueError, UserFile.DoesNotExist):
-        return {'redirect' : '/'}
+        return {'redirect': '/'}
 
     if user_file.user == request.user:
         if request.method == "POST":
             user_file.delete()
             messages.info(request, "File was deleted")
-            return {'redirect' : '/'}
+            return {'redirect': '/'}
 
-        return {'filedelete' : {
-            'action_link' : request.path,
-            'back_link' : reverse(fileinfo, kwargs={'id': id}),
-            'file' : user_file.get_file_name()
+        return {'filedelete': {
+            'action_link': request.path,
+            'back_link': reverse(fileinfo, kwargs={'id': id}),
+            'file': user_file.get_file_name()
         }}
-    return {'redirect' : '/'}
+    return {'redirect': '/'}
 
 
 @ajaxify
@@ -258,4 +258,4 @@ def ajax_logout(request):
     """Logout user with ajax request
     """
     logout(request)
-    return {'redirect' : '/'}
+    return {'redirect': '/'}
