@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>IBStorage</title>
+    <script type="text/javascript">
+        if (typeof window.opener != 'undefined') {
+            try {
+                window.opener.$.address.update()
+                setTimeout(function() {window.close()}, 1000)
+            }
+            catch (e) {}
+        }
+    </script>
+</head>
+
+<body>
+<p>
+    You are now logged in and can
+    <a href="javascript:window.close()">close this window</a>
+</p>
+</body>
+</html>

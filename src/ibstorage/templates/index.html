@@ -1,5 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
+{% load flatpages %}
 <html>
 <head>
     <title>IBStorage</title>
@@ -12,60 +13,33 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.address-1.4.js?crawlable=1&autoUpdate=1"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/pure.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/storage.js"></script>
     <script type="text/javascript">
-        var blocks = ['login', 'filelist', 'fileupload']
-        var filelist_directives = {
-            '.emptyMsg' : 'emptyMsg',
-            '.files li' :  {
-                'file <- files' :{
-                    'a' : 'file.file',
-                    'a@href' : 'file.link',
-                    'a@rel' : 'address:#{file.link}',
-                    'em' : 'file.uploaded_at'
-                }
-            }
-        }
-        var fileupload_directives = {}
-        function reload_callback(data) {
-            console.log(data)
-            var block;
-            var blockDiv;
-            if (data.hasOwnProperty('redirect')) {
-                console.log('redirect')
-                return $.address.value(data.redirect)
-            }
-            
-            for (var i=0, blocksNum=blocks.length; i<blocksNum; i++ ) {
-                block = blocks[i];
-                if (data.hasOwnProperty(block)) {
-                    blockDiv = $("#"+block)
-                    blockDiv.show()
-                    if (typeof window[block+'_render'] == 'undefined') {
-                        window[block+'_render'] = $p("#"+block).compile(window[block+'_directives'])
-                    }
-                    $p("#"+block).render(data[block], window[block+'_render'])
-                }
-                else {
-                    $("#"+block).hide()
-                }
-            }
-        }
-        function ajax_load(url) {
-            $.ajax({
-                url: url,
-                success: reload_callback
-            })
-        }
         $(function() {
             $.address.change(function(event) {
                 var url = event.value
                 if (url == '/' || url.indexOf('?')>=0 && url.substr(0,url.indexOf('?')))
                 {
-                    url = '/list-files/';
+                    url = '{% url list_files %}';
                 }
                 ajax_load(url);
             });
-            $("#uploadForm").live('submit', function(){ $(this).ajaxSubmit({success:reload_callback,dataType:'json'}); return false; })
+            $("form.address-form").live('submit', function(){
+                $(this).ajaxSubmit({success:reload_callback,dataType:'json'});
+                return false;
+            })
+            $('.address-link').live('click', function () {
+                $.address.value($(this).attr('href'))
+                return false;
+            })
+            $('.popup-link').live('click', function() {
+                window.open($(this).attr('href'), 'storage popup', 'width:640;height=480;resizable=0')
+                return false
+            })
+            $('.pages').live('change', function () {
+                baseURL = $(this).attr('baseurl')
+                $.address.value(baseURL+$(this).val()+'/')
+            })
         })
 
 
@@ -75,32 +49,129 @@
 <div id="head">
     <div class="container">
         <div class="span-4">Logo here</div>
-        <div class="span-4 prepend-16 last">Some information here {{ user }}</div>
+        <div class="span-4 prepend-16 last">Some information here</div>
+        <div class="span-16 prepend-4" id="messages">
+            <div class="msg-display"></div>
+            <div class="clear"></div>
+        </div>
     </div>
 </div>
 <div id="main">
     <div class="container">
         <div id="instructions" class="span-7 blueblock">
-            <a href="/l/" rel="address:/l/">L</a><br/>
-            <a href="/upload/" rel="address:/upload/">Upload</a>
+            <h3>Hello <span class="username"></span></h3>
+            <p>Some instructions on how to use this site</p>
+            <p>
+            In at augue risus, vitae gravida odio. In vel sapien odio, sed iaculis mauris.
+            </p>
+            <p>
+            Vivamus consectetur rutrum faucibus. Proin accumsan, risus et blandit bibendum, lacus neque lobortis orci, a mollis eros mi at velit. 
+            </p>
+            <p>Usefull links</p>
+            <p class="auth">
+                <a href="/" class="address-link">List your files</a><br>
+                <a href="/upload/" class="address-link">Upload new file</a><br>
+                <a href="{% url ajax_logout %}" class="address-link">Logout</a>
+            </p>
+            <p class="guest">
+                <a href="/" class="address-link">Login</a>
+            </p>
         </div>
-        <div id="login" class="span-7 blueblock"></div>
+        <div id="login" class="span-7 blueblock">
+            <h3>Login</h3>
+            <p>You have to login</p>
+            <p>
+                <a href="{% url socialauth_begin backend="google-oauth2" %}" class="popup-link">Using Google</a>
+                <br>
+                <a href="{% url socialauth_begin backend="twitter" %}" class="popup-link">Using Twitter</a>
+            </p>
+        </div>
         <div id="filelist" class="span-7 blueblock">
             <div class="emptyMsg"></div>
             <ul class="files">
                 <li><a></a><br/><em></em></li>
             </ul>
+            <div class="pager">
+                Page: 
+                <select class="pages" baseurl="{% url list_files %}">
+                    <option></option>
+                </select>
+            </div>
         </div>
         <div id="fileupload" class="span-7 blueblock">
-            <form action="/upload/" id="uploadForm" method="POST" enctype="multipart/form-data" >
-                <input id="file_upload" name="file_upload" type="file">
+            <form action="/upload/" id="uploadForm" method="POST" enctype="multipart/form-data" class="address-form" >
+                {% for f in fileform %}
+                    <div class="field">
+                        {{ f.label_tag }}<br>
+                        {{ f }} {{ f.help_text }}<br>
+                        <em class="{{ f.name }}-err field-error"></em>
+                    </div>
+                {% endfor %}
+                <input type="submit" value="Upload">
+            </form>
+        </div>
+        <div id="fileinfo" class="span-7 blueblock">
+            <a class="back address-link" href="/" >&lt; List all files</a>
+            <h3></h3>
+            <div class="details">
+                <div class="field">
+                    <strong></strong><br/>
+                    <span></span>
+                </div>
+            </div>
+            <div class="actions">
+                Available actions:
+                <ul>
+                    <li><a></a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="sharebox" class="span-7 blueblock">
+            <a class="back">&lt; Back to file</a>
+            <h3></h3>
+            <p>
+                You can share this file by either sending this link to your friends
+                <br>
+                <input type="text" class="link" value="">
+            </p>
+            <p>Or emailing your friends via our service</p>
+            <form id="shareForm" class="share-form address-form" action="" method="POST">
+                <div class="form-content"></div>
                 <input type="submit">
             </form>
+        </div>
+        <div id="publish" class="span-7 blueblock">
+            <h3></h3>
+            <p>File status is <span class="status"></span></p>
+            <p>Do you want to change it?</p>
+            <form class="address-form" method="POST" action="">
+                <input type="submit" value="Yes"> or
+                <a class="back">No</a>
+            </form>
+        </div>
+        <div id="filedelete" class="span-7 blueblock">
+            <h3></h3>
+            <p>Do you want to delete file?</p>
+            <form class="address-form" method="POST" action="">
+                <input type="submit" value="Yes"> or
+                <a class="back">No</a>
+            </form>
+        </div>
+        <div id="flatpage" class="span-7 blueblock">
+            <h3></h3>
+            <div class="content"></div>
         </div>
     </div>
 </div>
 <div id="footer">
-    <div class="container"></div>
+    <div class="container">
+        <div class="span-20 prepend-4 last">
+            {% get_flatpages as flatpages %}
+            {% for page in flatpages %}
+                <a class="address-link" href="{{ page.url }}">{{ page.title }}</a>&nbsp;&nbsp;
+            {% endfor %}
+        </div>
+    </div>
 </div>
 </body>
 </html>

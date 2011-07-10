@@ -4,10 +4,9 @@ from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from django.template.response import TemplateResponse
+from django.views.generic.base import TemplateView
 
 admin.autodiscover()
-TemplateResponse
 
 urlpatterns = patterns('',
     # Example:
@@ -18,7 +17,9 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    url(r'^auth/logout/', 'django.contrib.auth.views.logout', {'next_page':'/'}),
+    url(r'^auth/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}),
+    url(r'^auth/logout/ajax/$', 'storage.views.ajax_logout', name='ajax_logout'),
+    url(r'^auth/logged-in/$', TemplateView.as_view(template_name='logged_in.html')),
     url(r'^auth/', include('social_auth.urls')),
     url(r'', include('storage.urls'))
 )

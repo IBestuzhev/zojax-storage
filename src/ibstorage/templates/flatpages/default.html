@@ -1,0 +1,8 @@
+{"flatpage":{
+    "title":"{{ flatpage.title|escapejs }}",
+    "content":"{{ flatpage.content|escapejs }}"
+}
+{% if user.is_authenticated %},
+    "instructions":{"username":"{{ user.username|escapejs }}"}
+{% endif %}
+}

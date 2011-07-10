@@ -4,4 +4,33 @@
     min-height: 300px;
     padding: 10px;
     margin: 10px;
+    /* gradient http://www.colorzilla.com/gradient-editor/ */
+    background: white; /* Old browsers */
+    background: -moz-linear-gradient(top, #eaf2f5 0%, #ffffff 50%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eaf2f5), color-stop(50%,#ffffff)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #eaf2f5 0%,#ffffff 50%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #eaf2f5 0%,#ffffff 50%); /* Opera11.10+ */
+    background: -ms-linear-gradient(top, #eaf2f5 0%,#ffffff 50%); /* IE10+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaf2f5', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+    background: linear-gradient(top, #eaf2f5 0%,#ffffff 50%); /* W3C */
+}
+
+.blueblock textarea {
+    width: 252px;
+    height: auto;
+}
+
+.blueblock .hidden {
+    display: none;
+}
+
+li.public-file a {
+    font-weight: bold;
+}
+
+#head {
+    border-bottom: 2px solid #EAF2F5;
+}
+#footer {
+    border-top: 2px solid #EAF2F5;
 }

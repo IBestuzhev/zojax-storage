@@ -13,6 +13,10 @@ setup(
         'django==1.3',
         'south',
         'django-social-auth',
+        'django-storages>=1.2a',
+        'boto'
     ],
-    dependency_links = []
+    dependency_links = [
+        'https://bitbucket.org/david/django-storages/get/tip.zip#egg=django-storages-1.2a'
+    ]
 )
