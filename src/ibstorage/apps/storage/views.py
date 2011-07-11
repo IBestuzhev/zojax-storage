@@ -1,4 +1,6 @@
 # Create your views here.
+import socket
+
 from django.contrib.auth import logout
 from django.core.paginator import Paginator, InvalidPage
 from django.core.urlresolvers import reverse
@@ -8,7 +10,8 @@ from storage.utils import ajax_login_required, ajaxify, ajax_redirect
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_admins
+from boto.exception import S3ResponseError
 
 from storage.models import UserFile
 from storage.forms import UserFileForm, ShareForm
@@ -90,8 +93,15 @@ def upload(request):
     if form.is_valid():
         upload = form.save(commit=False)
         upload.user = request.user
-        upload.save()
-        messages.info(request, "File was successfully uploaded")
+        try:
+            # Catch AWS communications errors
+            upload.save()
+            messages.info(request, "File was successfully uploaded")
+        except (S3ResponseError, socket.error) as e:
+            messages.error(request,
+                           "Error saving your file, please try again later")
+            mail_admins("S3 Connection error",
+                        "%s\n Error occurred while uploading file. Check your AWS settings" % e)
         return {'redirect': '/list-files/', '_type': 'text/html'}
     return {'_type': 'text/html', "fileupload": {'errors': form.errors}}
 
@@ -169,7 +179,7 @@ def share(request, id):
         if form.cleaned_data['message']:
             msg = "%s\n\nHis/her comments:\n%s" % (msg, form.cleaned_data['message'])
 
-        send_mail("Check this file", msg, FROM_EMAIL, form.cleaned_data['emails'])
+        send_mail("Check this file", msg, FROM_EMAIL, form.cleaned_data['emails'], fail_silently=True)
         messages.info(request, "Your mail was sent to %s" % ','.join(form.cleaned_data['emails']))
         return {'redirect': file_link, '_type': 'text/html'}
 

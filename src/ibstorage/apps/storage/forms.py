@@ -15,6 +15,7 @@ email_separator_re = re.compile(r'[^\w\.\-\+@_]+')
 
 class EmailsListField(forms.CharField):
     """http://djangosnippets.org/snippets/1958/
+    Field that accepts several email addresses
     """
     widget = forms.Textarea(attrs={'rows':3})
 

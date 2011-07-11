@@ -9,7 +9,7 @@ REQUIREMENTS
 Buildout requires only python2.x itself.
 All other dependencies will be downloaded:
 - django
-- django-storages
+- django-storages and boto
 - south
 - django-social-auth
 
@@ -18,6 +18,7 @@ CONFIGURATION
 Create file src/ibstorage/local_settings.py to provide settings.
 You should put there such settings:
 - Amazon S3 Keys and bucket. If you don't put these files will be saved in MEDIA_ROOT = src/ibstorage/media/
+  Please note that if you change this settings files WILL NOT be copied from one storage/bucket to another
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME
@@ -32,8 +33,15 @@ You should put there such settings:
     EMAIL_PORT
 - Database settings
     DATABASES
+- Admin mail address to receive error notifications
+    ADMINS
 
 See file src/ibstorage/local_settings.py.sample for example
+
+NOTE ABOUT THE KEYS
+I put my Google and Twitter keys. The callback URL is set to http://127.0.0.1:8000/auth/complete/google-oauth2/
+and http://127.0.0.1:8000/auth/complete/twitter/ And so it may not work on other domains.
+I didn't put my AWS SECRET KEY, contact me in skype for it
 
 DEPLOYMENT
 
