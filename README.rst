@@ -42,5 +42,4 @@ TODO
 --------
 
 - Test coverage
-- Make views work without csrf_exempt
 - Make Pure blocks more flexible

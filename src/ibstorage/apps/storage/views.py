@@ -74,7 +74,7 @@ def list_files(request, page_num=1):
     return {'filelist': resp, }
 
 
-@csrf_exempt
+#@csrf_exempt
 @ajax_login_required
 @ajaxify
 def upload(request):
@@ -85,9 +85,11 @@ def upload(request):
 
     Expected output:
         errors - errors in upload form
+        csrf_token - form on this page uses iFrame submit instead of AJAX
+            So it's necessary to put csrf token to POST parameter, not header
     """
     if request.method == "GET":
-        return {"fileupload": True}
+        return {"fileupload": {'csrf_token': request.META.get('CSRF_COOKIE')}}
 
     form = UserFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -103,7 +105,8 @@ def upload(request):
             mail_admins("S3 Connection error",
                         "%s\n Error occurred while uploading file. Check your AWS settings" % e)
         return {'redirect': '/list-files/', '_type': 'text/html'}
-    return {'_type': 'text/html', "fileupload": {'errors': form.errors}}
+    return {'_type': 'text/html', "fileupload": {'errors': form.errors,
+                                                 'csrf_token': request.META.get('CSRF_COOKIE')}}
 
 
 @ajax_redirect
@@ -150,7 +153,7 @@ def fileinfo(request, id):
     }}
 
 
-@csrf_exempt
+#@csrf_exempt
 @ajax_login_required
 @ajaxify
 def share(request, id):
@@ -192,7 +195,7 @@ def share(request, id):
     }}
 
 
-@csrf_exempt
+#@csrf_exempt
 @ajax_login_required
 @ajaxify
 def change_publish(request, id):
@@ -229,7 +232,7 @@ def change_publish(request, id):
     return {'redirect': '/'}
 
 
-@csrf_exempt
+#@csrf_exempt
 @ajax_login_required
 @ajaxify
 def delete(request, id):

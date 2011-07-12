@@ -20,7 +20,7 @@
     height: auto;
 }
 
-.blueblock .hidden {
+.blueblock .hidden, .blueblock.hidden  {
     display: none;
 }
 

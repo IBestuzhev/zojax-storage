@@ -33,7 +33,7 @@
                 return false;
             })
             $('.popup-link').live('click', function() {
-                window.open($(this).attr('href'), 'storage popup', 'width:640;height=480;resizable=0')
+                window.open($(this).attr('href'), 'storage popup', 'width=640,height=480,resizable=0,toolbar=0,status=0')
                 return false
             })
             $('.pages').live('change', function () {
@@ -77,7 +77,7 @@
                 <a href="/" class="address-link">Login</a>
             </p>
         </div>
-        <div id="login" class="span-7 blueblock">
+        <div id="login" class="span-7 blueblock hidden">
             <h3>Login</h3>
             <p>You have to login</p>
             <p>
@@ -86,7 +86,7 @@
                 <a href="{% url socialauth_begin backend="twitter" %}" class="popup-link">Using Twitter</a>
             </p>
         </div>
-        <div id="filelist" class="span-7 blueblock">
+        <div id="filelist" class="span-7 blueblock hidden">
             <div class="emptyMsg"></div>
             <ul class="files">
                 <li><a></a><br/><em></em></li>
@@ -98,7 +98,7 @@
                 </select>
             </div>
         </div>
-        <div id="fileupload" class="span-7 blueblock">
+        <div id="fileupload" class="span-7 blueblock hidden">
             <form action="/upload/" id="uploadForm" method="POST" enctype="multipart/form-data" class="address-form" >
                 {% for f in fileform %}
                     <div class="field">
@@ -107,10 +107,11 @@
                         <em class="{{ f.name }}-err field-error"></em>
                     </div>
                 {% endfor %}
+                <input type='hidden' name='csrfmiddlewaretoken' value='' class="csrf_token" />
                 <input type="submit" value="Upload">
             </form>
         </div>
-        <div id="fileinfo" class="span-7 blueblock">
+        <div id="fileinfo" class="span-7 blueblock hidden">
             <a class="back address-link" href="/" >&lt; List all files</a>
             <h3></h3>
             <div class="details">
@@ -126,7 +127,7 @@
                 </ul>
             </div>
         </div>
-        <div id="sharebox" class="span-7 blueblock">
+        <div id="sharebox" class="span-7 blueblock hidden">
             <a class="back">&lt; Back to file</a>
             <h3></h3>
             <p>
@@ -140,7 +141,7 @@
                 <input type="submit">
             </form>
         </div>
-        <div id="publish" class="span-7 blueblock">
+        <div id="publish" class="span-7 blueblock hidden">
             <h3></h3>
             <p>File status is <span class="status"></span></p>
             <p>Do you want to change it?</p>
@@ -149,7 +150,7 @@
                 <a class="back">No</a>
             </form>
         </div>
-        <div id="filedelete" class="span-7 blueblock">
+        <div id="filedelete" class="span-7 blueblock hidden">
             <h3></h3>
             <p>Do you want to delete file?</p>
             <form class="address-form" method="POST" action="">
@@ -157,9 +158,14 @@
                 <a class="back">No</a>
             </form>
         </div>
-        <div id="flatpage" class="span-7 blueblock">
+        <div id="flatpage" class="span-7 blueblock hidden">
             <h3></h3>
             <div class="content"></div>
+        </div>
+        <div id="fallback" class="span-7 blueblock ">
+            <h3>Loading...</h3>
+            <p>This page requires javascript to be turned on</p>
+            <p>If this message doesn't disappear check your browser settings</p>
         </div>
     </div>
 </div>
