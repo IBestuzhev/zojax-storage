@@ -4,6 +4,7 @@ import socket
 from django.contrib.auth import logout
 from django.core.paginator import Paginator, InvalidPage
 from django.core.urlresolvers import reverse
+from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from storage.utils import ajax_login_required, ajaxify, ajax_redirect
@@ -29,6 +30,11 @@ class IndexView(TemplateView):
         ctx = super(IndexView, self).get_context_data(**kwargs)
         ctx['fileform'] = UserFileForm()
         return ctx
+
+    def dispatch(self, request, *args, **kwargs):
+        # Force updating CSRF cookie
+        request.META["CSRF_COOKIE_USED"] = True
+        return super(IndexView, self).dispatch(request, *args, **kwargs)
 
 
 # Ajaxified views are rendered with PureJS template engine
@@ -88,8 +94,11 @@ def upload(request):
         csrf_token - form on this page uses iFrame submit instead of AJAX
             So it's necessary to put csrf token to POST parameter, not header
     """
+    # don't use direct access request.META.get('CSRF_COOKIE')
+    # in this case django will NOT send a CSRF cookie. Use get_token function
+    csrf_token = get_token(request)
     if request.method == "GET":
-        return {"fileupload": {'csrf_token': request.META.get('CSRF_COOKIE')}}
+        return {"fileupload": {'csrf_token': csrf_token}}
 
     form = UserFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -106,7 +115,7 @@ def upload(request):
                         "%s\n Error occurred while uploading file. Check your AWS settings" % e)
         return {'redirect': '/list-files/', '_type': 'text/html'}
     return {'_type': 'text/html', "fileupload": {'errors': form.errors,
-                                                 'csrf_token': request.META.get('CSRF_COOKIE')}}
+                                                 'csrf_token': csrf_token}}
 
 
 @ajax_redirect
