@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+{% block scripts %}{% endblock %}
+{# We dont want to load additional scripts to this page #}
+{% block maincontent %}
+    <div class="span-7 prepend-8 blueblock">
+        <h2>Not found</h2>
+        <p>You tried to access {{ request_path }} but this is wrong page</p>
+        <p><a href="/">Start exploring our sire</a></p>
+    </div>
+{% endblock %}

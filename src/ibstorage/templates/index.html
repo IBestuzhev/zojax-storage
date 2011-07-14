@@ -5,15 +5,19 @@
 <head>
     <title>IBStorage</title>
     <!-- Framework CSS -->
+    {% block css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/screen.css" type="text/css" media="screen, projection" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/storage.css" type="text/css" media="screen, projection" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/print.css" type="text/css" media="print" />
     <!--[if IE]><link rel="stylesheet" href="{{ STATIC_URL }}css/ie.css" type="text/css" media="screen, projection" /><![endif]-->
+    {% endblock css %}
+    {% block scripts %}
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.address-1.4.js?crawlable=1&autoUpdate=1"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/pure.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/storage.js"></script>
+    {% endblock %}
     <script type="text/javascript">
         $(function() {
             $.address.change(function(event) {
@@ -58,6 +62,7 @@
 </div>
 <div id="main">
     <div class="container">
+        {% block maincontent %}
         <div id="instructions" class="span-7 blueblock">
             <h3>Hello <span class="username"></span></h3>
             <p>Some instructions on how to use this site</p>
@@ -167,6 +172,7 @@
             <p>This page requires javascript to be turned on</p>
             <p>If this message doesn't disappear check your browser settings</p>
         </div>
+        {% endblock maincontent %}
     </div>
 </div>
 <div id="footer">
